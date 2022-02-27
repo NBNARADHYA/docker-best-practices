@@ -1,0 +1,17 @@
+# Cache Layers and reduce container size
+
+FROM node:alpine
+
+USER node
+
+RUN mkdir /home/node/code
+
+WORKDIR /home/node/app
+
+COPY --chown=node:node package-lock.json package.json ./
+
+RUN npm ci
+
+COPY --chown=node:node . .
+
+CMD ["node", "index.js"]

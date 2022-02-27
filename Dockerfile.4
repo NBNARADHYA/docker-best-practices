@@ -1,0 +1,41 @@
+# Multi stage builds
+
+
+# Stage 1
+# Install dependencies
+# Transpile TyepScript code to JavaScript 
+FROM node-stretch AS builder
+
+WORKDIR /usr/app
+
+COPY package.json .
+
+COPY yarn.lock .
+
+RUN yarn install --frozen-lockfile
+
+COPY . .
+
+RUN npm run build
+
+
+# Stage 2
+# Install dependencies
+# Copy transpiled JavaScript code from stage 1 
+FROM node:alpine
+
+USER node
+
+RUN mkdir /home/node/app
+
+WORKDIR /home/node/app
+
+COPY --chown=node:node package.json .
+
+COPY --chown=node:node yarn.lock .
+
+RUN yarn install --frozen-lockfile --production
+
+COPY --from=builder --chown=node:node /usr/app/dist ./src
+
+CMD ["npm", "run", "start"]

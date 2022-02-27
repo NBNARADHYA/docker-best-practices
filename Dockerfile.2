@@ -1,0 +1,17 @@
+# Security
+
+FROM node:stretch
+
+USER node
+
+RUN mkdir /home/node/code
+
+WORKDIR /home/node/app
+
+COPY --chown=node:node . ./
+
+RUN npm ci
+
+EXPOSE 3000
+
+CMD ["node", "index.js"]
